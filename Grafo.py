@@ -31,6 +31,7 @@ class Grafo:
         destino_aux = self.busca_Vertice(destino)
         if (origem_aux is not None) and (destino_aux is not None):
             self.lista_Arestas.append(Aresta(origem_aux, destino_aux))
+            self.lista_Arestas.append(Aresta(destino_aux, origem_aux))
         else:
             print("Um do Vertice ou ambos são invalidos")
 
@@ -49,6 +50,14 @@ class Grafo:
                 return destino
         else:
             return None
+    def eh_adjacente(self, v1, v2):
+        for i in range(len(self.lista_Arestas)):
+            origem = self.lista_Arestas[i].getOrigem()
+            destino = self.lista_Arestas[i].getDestino()
+            if (v1.getId() == origem.getId()) and (v2.getId() == destino.getId()):
+                return True
+        else:
+            return False
        
     def grau(self, u):
         grau = 0

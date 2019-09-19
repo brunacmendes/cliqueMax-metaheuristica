@@ -31,6 +31,4 @@ class Vertice():
     def setOutput(self, out):
         self.output = out
 
-    def __eq__(self, v):
-        return self.id == v.id
 

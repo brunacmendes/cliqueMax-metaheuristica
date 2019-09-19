@@ -2,6 +2,7 @@ import numpy as np
 import sys
 import pulp as p
 from Grafo import Grafo
+import random
 
 
 class Principal:
@@ -9,6 +10,7 @@ class Principal:
     def __init__(self):
         self.matriz = []
         self.tamanho = 0
+        self.grafo = Grafo()
         self.vetor_de_graus = []
 
     def le_benchmarks(self, nome):
@@ -48,7 +50,7 @@ class Principal:
 ################################## CLIQUE MAXIMA DETERMINISTICA ################################
 
     def resolve_puLP(self):
-                # Cria o problema
+        # Cria o problema
         prob = p.LpProblem("Benchmark 01", p.LpMaximize)
  
         # Cria as variaveis
@@ -56,7 +58,7 @@ class Principal:
         for i in range(self.tamanho):
             x[i] = p.LpVariable("x" + str(i+1), 0, 1, 'Binary')
 
-            # Cria a funcao objetivo
+        # Cria a funcao objetivo
         lista = []
         for i in range(self.tamanho):
             lista += x[i]
@@ -83,7 +85,7 @@ class Principal:
         for variable in prob.variables():
             print("%s = %f" % (variable.name, variable.varValue))
 
-            # Objetivo otimizado
+        # Objetivo otimizado
         print("Clique Maxima: %0.2f" % p.value(prob.objective))
 
     def gera_saida_GLPK(self):
@@ -117,68 +119,117 @@ class Principal:
 #################################### CLIQUE MAXIMA HEURISTICA ##################################
 
     def cria_o_grafo (self):
-        grafo = Grafo()
-        self.vetor_de_graus = np.zeros(self.tamanho, dtype=p.integer)
+        self.vetor_de_graus = np.zeros(self.tamanho, dtype=np.float64)
+
+        for i in range (self.tamanho):
+             self.grafo.novo_Vertice(i)
+
         for i in range(1,self.tamanho):
-            grafo.novo_Vertice(i)
             for j in range(i):
                 if self.matriz[i][j] == 1:
-                    grafo.nova_Aresta(i,j)
+                    self.grafo.nova_Aresta(i,j)
                     self.vetor_de_graus[i] += 1
                     self.vetor_de_graus[j] += 1
-
-        print(self.vetor_de_graus)
-
-
+       
     def cria_lista_vertices(self):
         # cria lista com 10% dos vertices de maior grau do grafo
-        ten_percent = self.tamanho * 0.1
+        ten_percent = int(self.tamanho * 0.1)
         lista10 = []
         i = 0
-        while i <= range(ten_percent):
-            maximo = max(self.vetor_de_graus)
-            p_maximo = self.vetor_de_graus.index(maximo)
-            lista10.append(p_maximo)
-            self.vetor_de_graus[p_maximo] = 0
+        while i <= ten_percent:
+            ind = np.unravel_index(np.argmax(self.vetor_de_graus, axis=None), self.vetor_de_graus.shape)
+            lista10.append(ind[0])
+            self.vetor_de_graus[ind[0]] = 0
             i+=1
         return lista10
 
-    def retorna_vertice_aleatorio(self, lista_vertices, semente):
-        pass
-
     def ordena_vertices_adjacentes_pelo_grau(self, v):
-        pass
+        vertice = self.grafo.busca_Vertice(v)
+        qtd_vertices = self.grafo.grau(vertice)
+        ordenado = []
+        
+        i = 0
+        while i <= qtd_vertices:
+            adjacente = self.grafo.busca_Adjacente(vertice)
+            if adjacente == None:
+                return ordenado
 
-    def heuristica_baseada_GRASP(self, iteracoes, semente):
+            grau = self.grafo.grau(adjacente)
+            adjacente = adjacente.getId()
+            if len(ordenado) == 0:
+                ordenado.append(adjacente)
+            else:
+                for j in range(len(ordenado)):
+                    if grau < self.grafo.grau(self.grafo.busca_Vertice(ordenado[j])):
+                        ordenado.insert(j, adjacente)
+                        break
+                    if j == len(ordenado):
+                        ordenado.append(adjacente)
+            
+            i+=1
+
+        return ordenado
+
+    def heuristica_baseada_GRASP(self, iteracoes):
         solucao = []
         self.cria_o_grafo()
 
         # lista de vertices de maior grau (amostragem = 10% dos vertices)
         lista_vertices = self.cria_lista_vertices()
-        print(lista_vertices)
+
         for m in range(iteracoes):
-            # seleciona um vertice aleatorio da lista_vertices
+            m=m
             solucao_aux = []
+
+            # seleciona um vertice aleatorio da lista_vertices
+            v = random.choice(list(lista_vertices))
+        
             # insere vertice na solucao_aux
+            solucao_aux.append(v)
+
             # cria lista (ordenada pelo grau) de vertices adjacentes do vertice escolhido
-            lista_vertices_adjacentes = []
+            lista_vertices_adjacentes = self.ordena_vertices_adjacentes_pelo_grau(v)
+            
             for a in range(len(lista_vertices_adjacentes)):
-                # se a forma um clique com o vertice dentro de solucao_aux, coloca ele junto na solucao_aux
+                vertice = self.grafo.busca_Vertice(lista_vertices_adjacentes[a])
+                for h in range(len(solucao_aux)): # se a forma um clique com os vertices dentro de solucao_aux, coloca ele junto na solucao_aux
+                    vertice_solucao = self.grafo.busca_Vertice(solucao_aux[h])
+                    if self.grafo.eh_adjacente(vertice,vertice_solucao):
+                        coloca = True
+                    else:
+                        coloca = False
+                        break
+                if coloca:
+                    solucao_aux.append(lista_vertices_adjacentes[a])
+
                 if len(solucao_aux) > len(solucao):  # verificar se eh a melhor solução encontrada
                     solucao = solucao_aux
 
-            # coloca o primeiro elemento da lista na ultima posicao
+                # coloca o primeiro elemento da lista_vertices_adjacentes na ultima posicao
+                primeiro = lista_vertices_adjacentes.pop(0)
+                lista_vertices_adjacentes.insert(len(lista_vertices_adjacentes)+1, primeiro)
 
         return solucao, len(solucao)
+
+
+    def printa_solucao_heuristica(self, solucao, tamanho_clique):
+        print('\n\n SOLUÇÃO: ')
+        for i in range(len(solucao)):
+            print(str(solucao[i]))    
+        print("\nTAMANHO DO CLIQUE: " + str(tamanho_clique))
+        
+
 
 ##################################################################################################
 
     def executa(self):
-        self.le_benchmarks('CliqueOITO.txt')
+        self.le_benchmarks('benchmarks/Benchmark_small_test_set.txt')
+        vetor_solucao, tamanho_clique = self.heuristica_baseada_GRASP(100)
+        self.printa_solucao_heuristica(vetor_solucao, tamanho_clique)
         #self.le_benchmarks('benchmarks/DIMACS_benchmark_set_C125.9.txt' )
         # self.le_benchmarks('benchmarks/Benchmark_small_test_set.txt')
         # self.printa_matriz()
-        self.resolve_puLP()
+        #self.resolve_puLP()
         # self.gera_saida_GLPK()
 
 
