@@ -50,6 +50,12 @@ class Grafo:
                 return destino
         else:
             return None
+    
+    def desvisitar_nos(self, lista):
+        for i in range(len(lista)):
+            self.lista_Vertices[lista[i]].setVisitado(False)
+
+
     def eh_adjacente(self, v1, v2):
         for i in range(len(self.lista_Arestas)):
             origem = self.lista_Arestas[i].getOrigem()
