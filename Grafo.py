@@ -55,12 +55,11 @@ class Grafo:
         for i in range(len(lista)):
             self.lista_Vertices[lista[i]].setVisitado(False)
 
-
     def eh_adjacente(self, v1, v2):
         for i in range(len(self.lista_Arestas)):
             origem = self.lista_Arestas[i].getOrigem()
             destino = self.lista_Arestas[i].getDestino()
-            if (v1.getId() == origem.getId()) and (v2.getId() == destino.getId()):
+            if (v1 == origem.getId()) and (v2 == destino.getId()):
                 return True
         else:
             return False

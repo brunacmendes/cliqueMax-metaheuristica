@@ -3,13 +3,14 @@ import sys
 import pulp as p
 from Grafo import Grafo
 import random
+import time
 
 
 class Principal:
 
     def __init__(self):
         # tentativas = alpha * total_de_vertices
-        self.alpha_tentativas = 0.01
+        self.alpha_tentativas = 0.1
         self.matriz = []
         self.tamanho = 0
         self.grafo = Grafo()
@@ -151,35 +152,24 @@ class Principal:
         vertice = self.grafo.busca_Vertice(v)
         qtd_vertices = self.grafo.grau(vertice)
         ordenado = []
-        
+        lista_tupla = []
+
         i = 0
         while i <= qtd_vertices:
             adjacente = self.grafo.busca_Adjacente(vertice)
-            if adjacente == None:
-                return ordenado[::-1]
-
-            grau = self.grafo.grau(adjacente)
-            adjacente = adjacente.getId()
-            if len(ordenado) == 0:
-                ordenado.append(adjacente)
-            else:
-                tamanho = len(ordenado)
-                for j in range(tamanho):
-                    if grau < self.grafo.grau(self.grafo.busca_Vertice(ordenado[j])):
-                        ordenado.insert(j, adjacente)
-                        j=0
-                        break
-                    if grau == self.grafo.grau(self.grafo.busca_Vertice(ordenado[j])):
-                        ordenado.insert(j+1, adjacente)
-                        j=0
-                        break
-                    if j == len(ordenado) - 1:
-                        ordenado.append(adjacente)
-                        j=0
-            
+            if adjacente != None:
+                grau = self.grafo.grau(adjacente)
+                adjacente = adjacente.getId()
+                lista_tupla.append((adjacente,grau))
             i+=1
-
-        return ordenado
+        
+        lista_tupla.sort(key=lambda x: x[1])
+        ordenado, inutil = zip(*lista_tupla)
+        inutil=inutil
+        ordenado = list(ordenado)
+        #desvisitar nos depois de criar a lista
+        self.grafo.desvisitar_nos(ordenado)
+        return ordenado[::-1]
 
     def heuristica_baseada_GRASP(self, iteracoes):
         solucao = []
@@ -193,22 +183,25 @@ class Principal:
             m=m
             solucao_aux = []
 
-            #desvisitar vertices da lista_vertices
-            self.grafo.desvisitar_nos(lista_vertices)
-
             # seleciona um vertice aleatorio da lista_vertices
             v = random.choice(list(lista_vertices))
+
+            #remover vertice para nao sortear o mesmo na proxima iteracao
+            lista_vertices.remove(v)
         
             # insere vertice na solucao_aux
             solucao_aux.append(v)
 
             # cria lista (ordenada pelo grau) de vertices adjacentes do vertice escolhido
+            ini = time.time()
             lista_vertices_adjacentes = self.ordena_vertices_adjacentes_pelo_grau(v)
-            
+            fim = time.time()
+            print ("cria lista de vertices adj. ordenados pelo grau", fim-ini)
+
             for a in range(len(lista_vertices_adjacentes)):
-                vertice = self.grafo.busca_Vertice(lista_vertices_adjacentes[a])
+                vertice = lista_vertices_adjacentes[a]
                 for h in range(len(solucao_aux)): # se a forma um clique com os vertices dentro de solucao_aux, coloca ele junto na solucao_aux
-                    vertice_solucao = self.grafo.busca_Vertice(solucao_aux[h])
+                    vertice_solucao = solucao_aux[h]
                     if self.grafo.eh_adjacente(vertice,vertice_solucao):
                         coloca = True
                     else:
@@ -223,9 +216,8 @@ class Principal:
                 # coloca o primeiro elemento da lista_vertices_adjacentes na ultima posicao
                 #primeiro = lista_vertices_adjacentes.pop(0)
                 #lista_vertices_adjacentes.insert(len(lista_vertices_adjacentes)+1, primeiro)
-
+           
         return solucao, len(solucao)
-
 
     def printa_solucao_heuristica(self, solucao, tamanho_clique):
         print('\n\n SOLUÇÃO: ')
@@ -239,13 +231,19 @@ class Principal:
 
     def executa(self):
         self.le_benchmarks('benchmarks/DIMACS_benchmark_set_C125.9.txt')
+        #self.le_benchmarks('benchmarks/CliqueOITO.txt')
+        #self.le_benchmarks('benchmarks/Benchmark_small_test_set.txt')
         self.cria_o_grafo()
         tentativas = int(self.alpha_tentativas*len(self.vetor_de_graus))
         print("Tentativas = ", tentativas)
+        ini2 = time.time()
         vetor_solucao, tamanho_clique = self.heuristica_baseada_GRASP(tentativas)
+        fim2 = time.time()
+        print ("tempo total", fim2-ini2)
         self.printa_solucao_heuristica(vetor_solucao, tamanho_clique)
         #self.le_benchmarks('benchmarks/DIMACS_benchmark_set_C125.9.txt' )
-        # self.le_benchmarks('benchmarks/Benchmark_small_test_set.txt')
+        # self.le_benchmarks('benchmar
+        # ks/Benchmark_small_test_set.txt')
         # self.printa_matriz()
         #self.resolve_puLP()
         # self.gera_saida_GLPK()
