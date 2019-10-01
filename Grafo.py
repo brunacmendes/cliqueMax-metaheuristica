@@ -1,9 +1,10 @@
 from Aresta import *
 from Vertice import *
 
-'''Fonte: https://github.com/RenanCbcc/Grafos-Python'''
+'''Código adaptado de: https://github.com/RenanCbcc/Grafos-Python'''
 
 class Grafo:
+
     def __init__(self):
         self.lista_Vertices = []
         self.lista_Arestas = []
