@@ -60,26 +60,16 @@ class Heuristica:
        
     def cria_lista_vertices(self):
         # cria lista com 10% dos vertices de maior grau do grafo
-        vetor_aux = []
-        vetor_aux.append(self.tupla_de_graus)
-        vetor_aux = np.array(vetor_aux)
-        vetor_aux = vetor_aux[0]
-        ten_percent = int(self.tamanho * 0.3)
+        ten_percent = int(self.tamanho * 0.1)
         if ten_percent < 1:
             ten_percent = 1
         lista10 = []
-        
-        while len(lista10) < int(ten_percent):
-            #pega o index do maior valor
-            ind = np.unravel_index(np.argmax(vetor_aux, axis=None), vetor_aux.shape)
-            if self.grafo.busca_Vertice(ind[0]).getUsado() == False:
-                lista10.append(ind[0])
-                vetor_aux[ind[0]] = 0
-            elif vetor_aux[ind[0]] == 0:
-                #signfica que o grafo é muito pequeno para tantas iteracoes
-                self.grafo.liberar_nos([])
-            else:
-                vetor_aux[ind[0]] = 0
+        i = 0
+        while i < ten_percent:
+            ind = np.unravel_index(np.argmax(self.vetor_de_graus, axis=None), self.vetor_de_graus.shape)
+            lista10.append(ind[0])
+            self.vetor_de_graus[ind[0]] = 0
+            i+=1
         return lista10
 
     def ordena_vertices_adjacentes_pelo_grau(self, v):
@@ -102,17 +92,16 @@ class Heuristica:
     def heuristica_baseada_GRASP(self, iteracoes):
         solucao = []
 
+        # lista de vertices de maior grau (amostragem = 10% dos vertices)
+        lista_vertices = self.cria_lista_vertices()
+
         for m in range(iteracoes):
             ini = time.time()
             solucao_aux = []
 
-            # lista de vertices de maior grau (amostragem = 10% dos vertices)
-            lista_vertices = self.cria_lista_vertices()
-        
             # seleciona um vertice aleatorio da lista_vertices
             v = random.choice(lista_vertices)
             print('vertice escolhido: ' + str(v))
-            self.grafo.busca_Vertice(v).setUsado(True)
 
             # insere vertice na solucao_aux
             solucao_aux.append(v)

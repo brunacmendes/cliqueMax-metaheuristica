@@ -6,10 +6,17 @@ class Vertice():
         self.output = 0
         self.grau = 0
         self.visitado = False
+        self.usado = False
         self.predecessor = []
 
     def setVisitado(self, valor):
         self.visitado = valor
+
+    def setUsado(self, valor):
+        self.usado = valor
+
+    def getUsado(self):
+        return self.usado
 
     def getVisitado(self):
         return self.visitado
