@@ -26,8 +26,6 @@ files.append('benchmarks/p_hat300-2.clq')
 files.append('benchmarks/p_hat1500-2.clq')
 #files.append('benchmarks/small_test_set.txt')
 
-
-
 size = len(files)
 heuristica = Heuristica()
 # roda heurística ITER vezes e salva resultados

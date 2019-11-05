@@ -70,11 +70,7 @@ class Principal:
                         str(i+1) + "." + str(j+1)
 
                 # Escreve o modelo no arquivo
-        prob.writeLP("
-        
-        
-        
-        CLIQUEModelo.lp")
+        prob.writeLP("CLIQUEModelo.lp")
 
         # Resolve o problema
         prob.solve()
