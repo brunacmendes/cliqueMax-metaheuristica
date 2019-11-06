@@ -1,8 +1,8 @@
-import numpy as np
 import sys
+import numpy as np
 import pulp as p
-from Grafo import Grafo
-from Instancia import Instancia
+from estrutura_dados.Grafo import Grafo
+from estrutura_dados.Instancia import Instancia
 import random
 import time
 

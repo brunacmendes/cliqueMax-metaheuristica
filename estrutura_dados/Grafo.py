@@ -1,5 +1,5 @@
-from Aresta import *
-from Vertice import *
+from estrutura_dados.Aresta import *
+from estrutura_dados.Vertice import *
 
 class Grafo:
 

@@ -1,4 +1,4 @@
-from Grafo import Grafo
+from estrutura_dados.Grafo import Grafo
 import numpy as np
 import sys
  

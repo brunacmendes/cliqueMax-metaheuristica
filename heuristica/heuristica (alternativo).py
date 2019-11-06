@@ -1,7 +1,7 @@
 import numpy as np
 import sys
 import pulp as p
-from Grafo import Grafo
+from estrutura_dados.Grafo import Grafo
 import random
 import time
 
