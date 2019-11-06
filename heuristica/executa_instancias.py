@@ -1,4 +1,4 @@
-from heuristica import Heuristica
+from heuristica.heuristica import Heuristica
 
 ITER = 100
 

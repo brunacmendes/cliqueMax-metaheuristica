@@ -1,18 +1,19 @@
 from Aresta import *
 from Vertice import *
 
-
 class Grafo:
 
     def __init__(self):
         self.lista_Vertices = []
         self.lista_Arestas = []
-        self.dicionario_adjacencia = dict()
+        self.dicionario_adjacencia = dict() #lista de indices de vertices adjacentes
+        self.dicionario_V_adjacencia = dict() #lista de objetos Vertices adjacentes
 
     def novo_Vertice(self, identificador):
         # string = input(str("Identificador do Vertice: "))
         self.lista_Vertices.append(Vertice(identificador))
         self.dicionario_adjacencia[identificador] = []
+        self.dicionario_V_adjacencia[identificador] = []
 
 
     def busca_Vertice(self, identificador):  # Método recebe um int
@@ -28,6 +29,9 @@ class Grafo:
             self.lista_Arestas.append(Aresta(origem_aux, destino_aux))
             self.dicionario_adjacencia[origem].append(destino)
             self.dicionario_adjacencia[destino].append(origem)
+            self.dicionario_V_adjacencia[origem].append(destino_aux)
+            self.dicionario_V_adjacencia[destino].append(origem_aux)
+
             #self.lista_Arestas.append(Aresta(destino_aux, origem_aux))
         else:
             print("Um do Vertice ou ambos são invalidos")
@@ -35,10 +39,11 @@ class Grafo:
     def eh_adjacente(self, a, b):
         return a in self.dicionario_adjacencia[b]
 
-    def busca_Adjacentes(self,u): #metodo receve Vertice
-        return self.dicionario_adjacencia[u]
-
+    def busca_Adjacentes(self,u): #metodo receve indice vertice
+        return self.dicionario_adjacencia[u]  
     
+    def busca_V_Adjacentes(self, u): #metodo recebe indice vertice
+        return self.dicionario_V_adjacencia[u]
 
     def liberar_nos(self, lista):
         if len(lista) > 0:
