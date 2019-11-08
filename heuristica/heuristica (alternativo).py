@@ -1,5 +1,10 @@
+
+import os, sys
+
+from os.path import dirname, join, abspath
+sys.path.insert(0, abspath(join(dirname(__file__), '..')))
+
 import numpy as np
-import sys
 import pulp as p
 from estrutura_dados.Grafo import Grafo
 import random

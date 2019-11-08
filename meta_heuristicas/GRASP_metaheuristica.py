@@ -1,4 +1,8 @@
-import sys
+import os, sys
+
+from os.path import dirname, join, abspath
+sys.path.insert(0, abspath(join(dirname(__file__), '..')))
+
 import numpy as np
 import pulp as p
 from estrutura_dados.Grafo import Grafo
@@ -35,10 +39,12 @@ class GRASP:
                 self.dic_graus_C[C[i].getId()] = C[i].getGrau()
 
             #pega o menor grau (d1) dos vertices no subgrafo C
-            d1 = min(self.dic_graus_C, value=self.dic_graus_C.get)
+            d1_key = min(self.dic_graus_C, key=self.dic_graus_C.get)
+            d1 = self.dic_graus_C[int(d1_key)]
 
             #pega o maior grau (d0) dos vertices no sobgrafo C
-            d0 = max(self.dic_graus_C, value=self.dic_graus_C.get)
+            d0_key = max(self.dic_graus_C, key=self.dic_graus_C.get)
+            d0 = self.dic_graus_C[int(d0_key)]
 
             #RCL = lista de vertices candidatos cujo grau > d1 + alpha(d0-d1)
             RLC = self.RLC(C, d0, d1, alpha)
