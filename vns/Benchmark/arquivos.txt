@@ -1,0 +1,7 @@
+p_hat300-1.clq
+p_hat300-2.clq
+p_hat300-3.clq
+p_hat700-1.clq
+p_hat700-2.clq
+p_hat700-3.clq
+p_hat1500-2.clq

@@ -1,0 +1,13 @@
+C125.9.clq
+C250.9.clq
+C500.9.clq
+C1000.9.clq
+C2000.5.clq
+p_hat300-1.clq
+p_hat300-2.clq
+p_hat300-3.clq
+p_hat700-1.clq
+p_hat700-2.clq
+p_hat700-3.clq
+p_hat1500-1.clq
+p_hat1500-2.clq
